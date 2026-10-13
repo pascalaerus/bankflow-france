@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0b132b"><title>Vue d’ensemble — BankFlow</title><link rel="stylesheet" href="styles.css"></head>
+<body data-page="dashboard">
+  <main id="appView" class="app-shell">
+    <header class="topbar"><a class="brand brand-link" href="dashboard.html"><div class="brand-mark small-mark" aria-hidden="true"><span>B</span><i></i></div><div><strong>BANK<span>FLOW</span></strong><small>FRANCE</small></div></a><div class="topbar-right"><span class="demo-chip">VOTRE ESPACE</span><span id="userEmail" class="user-email"></span><button id="logoutBtn" class="ghost-btn">Déconnexion ↗</button></div></header>
+    <div class="dashboard">
+      <section class="welcome-row"><div><p class="eyebrow">VOTRE ESPACE PERSONNEL</p><h1>Bonjour, bienvenue 👋</h1><p class="muted">Voici un aperçu de votre compte.</p></div><div class="today-pill"><span class="secure-dot"></span> Espace actif</div></section>
+      <section class="balance-grid">
+        <article class="balance-card"><div class="balance-top"><span>Solde disponible <span class="info-dot">i</span></span><button class="visibility-btn light-visibility" type="button" data-visibility-toggle aria-label="Afficher le solde" aria-pressed="false">◉</button></div><p id="balance" class="balance-amount sensitive" data-sensitive="true">•••••••• <small>€</small></p><div class="balance-bottom"><span><i class="green-dot"></i> Compte actif</span><span>EUR · €</span></div><div class="card-decoration"></div></article>
+        <article class="mini-card"><div class="mini-icon blue">↗</div><span class="mini-label">Virements effectués</span><strong id="transferCount">0</strong></article><article class="mini-card"><div class="mini-icon green">✓</div><span class="mini-label">Statut du compte</span><strong>Actif</strong></article>
+      </section>
+      <section class="quick-links"><a class="quick-link" href="transfer.html"><span class="mini-icon blue">↗</span><span><strong>Nouveau virement</strong><small>Effectuer une opération</small></span><b>→</b></a><a class="quick-link" href="history.html"><span class="mini-icon green">▤</span><span><strong>Historique</strong><small><span id="historyCount">0 opération</span></small></span><b>→</b></a></section>
+      <footer class="app-footer">BankFlow France · 2026</footer>
+    </div>
+  </main><div id="toast" class="toast" role="status" aria-live="polite"></div><script src="app.js"></script>
+</body></html>

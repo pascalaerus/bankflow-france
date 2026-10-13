@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b132b">
+  <title>BankFlow — France</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="loginView" class="login-shell">
+    <section class="login-card">
+      <div class="brand brand-login"><div class="brand-mark" aria-hidden="true"><span>B</span><i></i></div><div><strong>BANK<span>FLOW</span></strong><small>FRANCE</small></div></div>
+      <p class="eyebrow">ESPACE CLIENT</p><h1>Bienvenue chez vous.</h1><p class="muted">Connectez-vous.</p>
+      <form id="loginForm">
+        <label for="email">Adresse e-mail</label><input id="email" name="email" type="email" autocomplete="username" placeholder="nom@exemple.fr" required>
+        <label for="password">Mot de passe</label><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Saisissez un mot de passe" required>
+        <p id="loginError" class="error" role="alert"></p><button class="primary-btn full" type="submit">Accéder à mon espace <span>→</span></button>
+      </form>
+      <p class="login-foot"><span class="secure-dot"></span> Données conservées dans ce navigateur</p>
+    </section>
+    <aside class="login-aside"><div class="aside-orb orb-one"></div><div class="aside-orb orb-two"></div><p class="eyebrow light">UNE BANQUE, UNE EXPÉRIENCE</p><h2>Votre banque,<br>partout avec vous.</h2><p>Un tableau de bord pensé pour illustrer une expérience bancaire claire, fluide et moderne.</p><div class="aside-stats"><div><strong>24/7</strong><span>Accès</span></div><div><strong>100%</strong><span>Fiable</span></div></div></aside>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
