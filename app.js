@@ -3,7 +3,7 @@
   "use strict";
   const ALLOWED_EMAIL = "janujacqvirement@gmail.com";
   const ALLOWED_PASSWORD = "COESY@1basse-terre";
-  const INITIAL_BALANCE = 4.347.122.412;
+  const INITIAL_BALANCE = 4.347.122,412;
   const KEYS = { session: "bankflow_demo_session", balance: "bankflow_demo_balance", history: "bankflow_demo_history" };
   const $ = (selector) => document.querySelector(selector);
   const page = document.body.dataset.page || "login";
