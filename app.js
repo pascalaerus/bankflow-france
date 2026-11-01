@@ -1,81 +1,36 @@
-/* BankFlow France — simulation front-end uniquement. Les données restent dans ce navigateur. */
+/* Prototype local uniquement : aucune banque ni aucun paiement réel. */
 (() => {
   "use strict";
-  const ALLOWED_EMAIL = "janujacqvirement@gmail.com";
-  const ALLOWED_PASSWORD = "COESY@1basse-terre";
-  const INITIAL_BALANCE = 4347122.412;
-  const KEYS = { session: "bankflow_demo_session", balance: "bankflow_demo_balance", history: "bankflow_demo_history" };
+  const KEYS = { session: "bankflow_demo_session", user: "bankflow_demo_user", balance: "bankflow_demo_balance", history: "bankflow_demo_history" };
+  const INITIAL_BALANCE = 4347122.41;
+  const DEMO_RIB = "FR00 12345 67890 12345 67890 123";
   const $ = (selector) => document.querySelector(selector);
   const page = document.body.dataset.page || "login";
+  let amountsVisible = true;
   let toastTimer;
-  let amountsVisible = false;
-
-  function getBalance() { const stored = localStorage.getItem(KEYS.balance); if (stored === null || !Number.isFinite(Number(stored))) { localStorage.setItem(KEYS.balance, String(INITIAL_BALANCE)); return INITIAL_BALANCE; } return Number(stored); }
-  function setBalance(value) { localStorage.setItem(KEYS.balance, value.toFixed(2)); }
-  function getHistory() { try { const data = JSON.parse(localStorage.getItem(KEYS.history) || "[]"); return Array.isArray(data) ? data : []; } catch { return []; } }
-  function setHistory(history) { localStorage.setItem(KEYS.history, JSON.stringify(history)); }
-  function euro(value) { return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(value); }
-  function dateTime(iso) { return new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeStyle: "medium" }).format(new Date(iso)); }
-  function mask(value) { return "••••••••" + (String(value).includes("€") ? " €" : ""); }
-  function showToast(message, type = "success") { const toast = $("#toast"); if (!toast) return; clearTimeout(toastTimer); toast.textContent = message; toast.className = `toast show ${type === "error" ? "error-toast" : "success"}`; toastTimer = setTimeout(() => toast.classList.remove("show"), 3200); }
-  function isLoggedIn() { return localStorage.getItem(KEYS.session) === ALLOWED_EMAIL; }
-  function protectPage() { if (page !== "login" && !isLoggedIn()) window.location.replace("index.html"); if (page === "login" && isLoggedIn()) window.location.replace("dashboard.html"); }
-  function setupHeader() { const email = $("#userEmail"); if (email) email.textContent = localStorage.getItem(KEYS.session) || ""; const logout = $("#logoutBtn"); if (logout) logout.addEventListener("click", () => { localStorage.removeItem(KEYS.session); window.location.replace("index.html"); }); }
-
-  function applyVisibility() {
-    document.querySelectorAll("[data-sensitive]").forEach((element) => {
-      const value = element.dataset.value || "";
-      element.textContent = amountsVisible ? value : mask(value);
-    });
-    document.querySelectorAll("[data-visibility-toggle]").forEach((button) => {
-      button.setAttribute("aria-pressed", String(amountsVisible));
-      button.setAttribute("aria-label", amountsVisible ? "Masquer les montants" : "Afficher les montants");
-      if (button.classList.contains("panel-visibility")) button.textContent = amountsVisible ? "◉ Masquer les montants" : "◉ Afficher les montants";
-      else button.textContent = amountsVisible ? "◉" : "◌";
-    });
-  }
-  function setupVisibility() { document.querySelectorAll("[data-visibility-toggle]").forEach((button) => button.addEventListener("click", () => { amountsVisible = !amountsVisible; applyVisibility(); })); }
-  function addSensitiveCell(parent, value, className = "") { const cell = document.createElement("td"); cell.className = `${className} sensitive`; cell.dataset.sensitive = "true"; cell.dataset.value = value; parent.append(cell); return cell; }
-
-  function renderDashboard() {
-    const balance = getBalance(); const history = getHistory();
-    const balanceEl = $("#balance"); if (balanceEl) { balanceEl.dataset.value = `${euro(balance)}`; balanceEl.innerHTML = ""; balanceEl.dataset.sensitive = "true"; }
-    if ($("#transferCount")) $("#transferCount").textContent = String(history.length);
-    if ($("#historyCount")) $("#historyCount").textContent = `${history.length} opération${history.length > 1 ? "s" : ""}`;
-    applyVisibility();
-  }
-
-  function renderTransfer() {
-    const balance = getBalance(); const available = $("#availableSmall");
-    if (available) { available.dataset.value = euro(balance); available.dataset.sensitive = "true"; }
-    const amount = $("#amount"); if (amount) amount.max = balance.toFixed(2);
-    applyVisibility();
-  }
-
-  function renderHistory() {
-    const history = getHistory();
-    if ($("#historyCount")) $("#historyCount").textContent = `${history.length} opération${history.length > 1 ? "s" : ""}`;
-    if ($("#emptyState")) $("#emptyState").classList.toggle("hidden", history.length > 0);
-    if ($("#historyTableWrap")) $("#historyTableWrap").classList.toggle("hidden", history.length === 0);
-    if ($("#clearHistoryBtn")) $("#clearHistoryBtn").classList.toggle("hidden", history.length === 0);
-    const rows = $("#historyRows"); if (!rows) return; rows.replaceChildren();
-    history.slice().reverse().forEach((tx) => { const tr = document.createElement("tr"); const beneficiary = document.createElement("td"); const name = document.createElement("strong"); name.textContent = tx.beneficiary; const iban = document.createElement("small"); iban.textContent = tx.iban; beneficiary.append(name, iban); tr.append(beneficiary); const date = document.createElement("td"); date.textContent = dateTime(tx.date); tr.append(date); addSensitiveCell(tr, `− ${euro(tx.amount)}`, "debit"); addSensitiveCell(tr, euro(tx.balanceAfter)); rows.append(tr); });
-    applyVisibility();
-  }
-
-  function setupLogin() {
-    const form = $("#loginForm"); if (!form) return;
-    form.addEventListener("submit", (event) => { event.preventDefault(); const email = $("#email").value.trim().toLowerCase(); const password = $("#password").value; const error = $("#loginError"); error.textContent = ""; if (email !== ALLOWED_EMAIL) { error.textContent = "Adresse non autorisée."; showToast("Connexion refusée : adresse e-mail non autorisée.", "error"); return; } if (password !== ALLOWED_PASSWORD) { error.textContent = "Mot de passe incorrect."; showToast("Connexion refusée : mot de passe incorrect.", "error"); return; } localStorage.setItem(KEYS.session, ALLOWED_EMAIL); window.location.replace("dashboard.html"); });
-  }
-
-  function setupTransfer() {
-    const form = $("#transferForm"); if (!form) return;
-    form.addEventListener("submit", (event) => { event.preventDefault(); const error = $("#transferError"); error.textContent = ""; const beneficiary = $("#beneficiary").value.trim(); const iban = $("#iban").value.trim().replace(/\s+/g, "").toUpperCase(); const amount = Number($("#amount").value); const balance = getBalance(); if (!beneficiary || !iban || !Number.isFinite(amount) || amount <= 0) { error.textContent = "Veuillez saisir un bénéficiaire, un RIB/IBAN et un montant valide."; return; } if (iban.length < 14 || iban.length > 34) { error.textContent = "Vérifiez la longueur du RIB/IBAN (14 à 34 caractères)."; return; } if (amount > balance) { error.textContent = "Solde insuffisant pour ce virement."; showToast("Solde insuffisant.", "error"); return; } const newBalance = Math.round((balance - amount + Number.EPSILON) * 100) / 100; const history = getHistory(); history.push({ id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`, date: new Date().toISOString(), beneficiary, iban, amount: Math.round(amount * 100) / 100, balanceAfter: newBalance }); setBalance(newBalance); setHistory(history); form.reset(); renderTransfer(); showToast(`Virement de ${euro(amount)} effectué avec succès.`); });
-  }
-
-  function setupHistory() { const button = $("#clearHistoryBtn"); if (button) button.addEventListener("click", () => { if (!confirm("Effacer l’historique des virements ? Le solde actuel ne sera pas modifié.")) return; setHistory([]); renderHistory(); showToast("Historique effacé."); }); }
-
-  protectPage();
+  const user = () => { try { return JSON.parse(localStorage.getItem(KEYS.user) || "null"); } catch { return null; } };
+  const balance = () => { const value = Number(localStorage.getItem(KEYS.balance)); return Number.isFinite(value) ? value : INITIAL_BALANCE; };
+  const saveBalance = (value) => localStorage.setItem(KEYS.balance, value.toFixed(2));
+  const history = () => { try { const value = JSON.parse(localStorage.getItem(KEYS.history) || "[]"); return Array.isArray(value) ? value : []; } catch { return []; } };
+  const saveHistory = (value) => localStorage.setItem(KEYS.history, JSON.stringify(value));
+  const euro = (value) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
+  const when = (value) => new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+  function toast(message, error = false) { const box = $("#toast"); if (!box) return; clearTimeout(toastTimer); box.textContent = message; box.className = `toast show ${error ? "error-toast" : "success"}`; toastTimer = setTimeout(() => box.classList.remove("show"), 3200); }
+  function requireSession() { const active = localStorage.getItem(KEYS.session); if (page !== "login" && !active) location.replace("index.html"); if (page === "login" && active) location.replace("dashboard.html"); }
+  function header() { const email = $("#userEmail"); if (email) email.textContent = localStorage.getItem(KEYS.session) || ""; const logout = $("#logoutBtn"); if (logout) logout.addEventListener("click", () => { localStorage.removeItem(KEYS.session); location.replace("index.html"); }); }
+  function mask(value) { return String(value).includes("€") ? "•••••••• €" : "••••••••"; }
+  function visibility() { document.querySelectorAll("[data-sensitive]").forEach((el) => { el.textContent = amountsVisible ? (el.dataset.value || "") : mask(el.dataset.value || ""); }); document.querySelectorAll("[data-visibility-toggle]").forEach((button) => { button.setAttribute("aria-pressed", String(amountsVisible)); button.textContent = button.classList.contains("panel-visibility") ? (amountsVisible ? "◉ Masquer les montants" : "◉ Afficher les montants") : (amountsVisible ? "◉" : "◌"); }); }
+  function setupVisibility() { document.querySelectorAll("[data-visibility-toggle]").forEach((button) => button.addEventListener("click", () => { amountsVisible = !amountsVisible; visibility(); })); }
+  function sensitiveCell(row, value, cls = "") { const td = document.createElement("td"); td.className = `sensitive ${cls}`; td.dataset.sensitive = "true"; td.dataset.value = value; row.append(td); }
+  function renderDashboard() { const el = $("#balance"); if (el) { el.dataset.value = euro(balance()); el.dataset.sensitive = "true"; } const items = history(); if ($("#transferCount")) $("#transferCount").textContent = String(items.length); if ($("#historyCount")) $("#historyCount").textContent = `${items.length} opération${items.length > 1 ? "s" : ""}`; visibility(); }
+  function renderHistory() { const entries = history(); if ($("#historyCount")) $("#historyCount").textContent = `${entries.length} opération${entries.length > 1 ? "s" : ""}`; $("#emptyState")?.classList.toggle("hidden", entries.length > 0); $("#historyTableWrap")?.classList.toggle("hidden", entries.length === 0); $("#clearHistoryBtn")?.classList.toggle("hidden", entries.length === 0); const rows = $("#historyRows"); if (!rows) return; rows.replaceChildren(); entries.slice().reverse().forEach((tx) => { const tr = document.createElement("tr"); const beneficiary = document.createElement("td"); const strong = document.createElement("strong"); strong.textContent = tx.beneficiary; const small = document.createElement("small"); small.textContent = tx.iban; beneficiary.append(strong, small); tr.append(beneficiary); const date = document.createElement("td"); date.textContent = when(tx.date); tr.append(date); sensitiveCell(tr, `− ${euro(tx.amount)}`, "debit"); sensitiveCell(tr, euro(tx.balanceAfter)); rows.append(tr); }); visibility(); }
+  function setupLogin() { const form = $("#loginForm"); if (!form) return; let mode = "login"; const toggle = $("#authToggle"); const submit = $("#authSubmit"); const message = $("#loginError"); toggle?.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; if (submit) submit.innerHTML = mode === "login" ? 'Accéder à mon espace <span>→</span>' : 'Créer mon compte de test <span>→</span>'; toggle.textContent = mode === "login" ? "Créer un compte de test" : "J’ai déjà un compte"; message.textContent = ""; }); form.addEventListener("submit", (event) => { event.preventDefault(); const email = $("#email").value.trim().toLowerCase(); const password = $("#password").value; message.textContent = ""; if (!email || password.length < 4) { message.textContent = "Saisissez un e-mail valide et un mot de passe d’au moins 4 caractères."; return; } const stored = user(); if (mode === "signup") { if (stored?.email === email) { message.textContent = "Un compte de test existe déjà pour cette adresse."; return; } localStorage.setItem(KEYS.user, JSON.stringify({ email, password })); localStorage.setItem(KEYS.balance, String(INITIAL_BALANCE)); saveHistory([]); } else if (!stored || stored.email !== email || stored.password !== password) { message.textContent = "Identifiants incorrects. Créez d’abord un compte de test sur cet appareil."; return; } localStorage.setItem(KEYS.session, email); location.replace("dashboard.html"); }); }
+  function setupTransfer() { const form = $("#transferForm"); if (!form) return; const available = $("#availableSmall"); if (available) { available.dataset.value = euro(balance()); available.dataset.sensitive = "true"; } const amountInput = $("#amount"); if (amountInput) amountInput.max = balance().toFixed(2); visibility(); form.addEventListener("submit", (event) => { event.preventDefault(); const error = $("#transferError"); error.textContent = ""; const beneficiary = $("#beneficiary").value.trim(); const iban = $("#iban").value.trim().replace(/\s+/g, "").toUpperCase(); const amount = Number(amountInput.value); const current = balance(); if (!beneficiary || !iban || !Number.isFinite(amount) || amount <= 0) { error.textContent = "Saisissez un bénéficiaire, un RIB de test et un montant valide."; return; } if (iban.length < 14 || iban.length > 34) { error.textContent = "Le RIB de test doit contenir entre 14 et 34 caractères."; return; } if (amount > current) { error.textContent = "Solde disponible insuffisant."; return; } const next = Math.round((current - amount + Number.EPSILON) * 100) / 100; const items = history(); items.push({ id: `${Date.now()}-${Math.random()}`, date: new Date().toISOString(), beneficiary, iban, amount: Math.round(amount * 100) / 100, balanceAfter: next, status: "Opération enregistrée" }); saveBalance(next); saveHistory(items); form.reset(); renderTransfer(); toast(`Virement de ${euro(amount)} ajouté aux validations.`); }); }
+  function renderTransfer() { const el = $("#availableSmall"); if (el) { el.dataset.value = euro(balance()); el.dataset.sensitive = "true"; } const amount = $("#amount"); if (amount) amount.max = balance().toFixed(2); visibility(); }
+  function setupHistory() { $("#clearHistoryBtn")?.addEventListener("click", () => { if (!confirm("Effacer l’historique ?")) return; saveHistory([]); renderHistory(); toast("Historique effacé."); }); }
+  function renderValidations() { const entries = history(); const pending = $("#approvalStatus"); if (pending) pending.textContent = "En attente d’approbation"; const wrap = $("#validationList"); const empty = $("#validationEmpty"); if (!wrap) return; wrap.replaceChildren(); if (empty) empty.classList.toggle("hidden", entries.length > 0); entries.slice().reverse().forEach((tx) => { const item = document.createElement("div"); item.className = "validation-item"; const title = document.createElement("strong"); title.textContent = `${tx.beneficiary} · ${euro(tx.amount)}`; const meta = document.createElement("p"); meta.textContent = `${when(tx.date)} · ${tx.status || "Opération enregistrée"}`; item.append(title, meta); wrap.append(item); }); }
+  function renderRib() { const output = $("#demoRib"); if (output) output.textContent = DEMO_RIB; $("#copyRib")?.addEventListener("click", async () => { try { await navigator.clipboard.writeText(DEMO_RIB); toast("RIB de test copié."); } catch { const range = document.createRange(); range.selectNodeContents(output); const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range); toast("Sélectionnez le RIB de test pour le copier.", true); } }); }
+  requireSession();
   if (page === "login") setupLogin();
-  else { setupHeader(); setupVisibility(); if (page === "dashboard") renderDashboard(); if (page === "transfer") { renderTransfer(); setupTransfer(); } if (page === "history") { renderHistory(); setupHistory(); } }
+  else { header(); setupVisibility(); if (page === "dashboard") renderDashboard(); if (page === "transfer") { renderTransfer(); setupTransfer(); } if (page === "history") { renderHistory(); setupHistory(); } if (page === "validations") renderValidations(); if (page === "rib") renderRib(); }
 })();

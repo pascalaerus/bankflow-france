@@ -1,17 +1,16 @@
-# BankFlow France — Démonstration locale
+# BankFlow — prototype de test
 
 ## Lancer
-1. Décompressez l'archive.
-2. Ouvrez `index.html` dans un navigateur moderne. Aucun serveur ni framework n'est nécessaire.
-3. Connectez-vous avec `janujacqvirement@gmail.com` et un mot de passe fictif quelconque.
+
+Ouvrez `index.html` dans un navigateur moderne. Aucun serveur, framework ou PHP n’est néctestre. Créez un compte de test avec une adresse et un mot de passe de votre choix (4 caractères minimum), puis reconnectez-vous avec ces identifiants sur le même navigateur.
 
 ## Fonctions
-- Session de démonstration persistée avec `localStorage`.
-- Solde initial : 387 721,62 €.
-- Pages séparées : vue d’ensemble, nouveau virement et historique.
-- Montants masqués par défaut, affichables avec le bouton de visibilité.
-- Simulation de virement, vérification du solde, historique et solde après opération.
-- Données conservées dans le navigateur utilisé.
+
+- Compte de test conservé localement dans le navigateur.
+- Vue « Mon compte », solde initial de test et montants masqués au chargement.
+- Virements de test, solde local, historique et page de suivi des validations.
+- RIB de test invalide (`FR00…`) avec bouton de copie.
 
 ## Important
-Cette interface est un prototype fictif : elle ne communique avec aucune banque et n'exécute aucun transfert réel. Les RIB/IBAN saisis ne sont pas vérifiés auprès d'un établissement. Ne saisissez pas de données bancaires réelles. Les données locales peuvent être modifiées depuis les outils du navigateur et ne constituent pas un registre bancaire fiable.
+
+BankFlow est une interface de test sans service bancaire. Les virements ne sont pas envoyés, le RIB est volontairement invalide et le statut d’approbation est indicatif. Les données `localStorage` sont propres au navigateur et ne constituent pas un registre fiable. N’utilisez aucune vraie donnée bancaire.
