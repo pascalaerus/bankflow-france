@@ -4,7 +4,7 @@
   const KEYS = { session: "bankflow_demo_session", balance: "bankflow_demo_balance", history: "bankflow_demo_history" };
   const DEMO_EMAIL = "janujacqvirement@gmail.com";
   const DEMO_PASSWORD = "COESY@1basse-terre";
-  const INITIAL_BALANCE = 4347122.41;
+  const INITIAL_BALANCE = 434712.224;
   const DEMO_RIB = "FR00 12345 67890 12345 67890 123";
   const $ = (selector) => document.querySelector(selector);
   const page = document.body.dataset.page || "login";
