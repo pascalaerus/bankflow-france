@@ -1,7 +1,7 @@
 /* Prototype local uniquement : aucune banque ni aucun paiement réel. */
 (() => {
   "use strict";
-  const KEYS = { session: "bankflow_demo_session", balance: "bankflow_demo_balance", history: "bankflow_demo_history" };
+  const KEYS = { session: "bankflow_demo_session", balance: "bankflow_demo_balance2", history: "bankflow_demo_history" };
   const DEMO_EMAIL = "janujacqvirement@gmail.com";
   const DEMO_PASSWORD = "COESY@1basse-terre";
   const INITIAL_BALANCE = 434712.224;
