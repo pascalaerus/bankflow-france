@@ -1,10 +1,10 @@
 /* Prototype local uniquement : aucune banque ni aucun paiement réel. */
 (() => {
   "use strict";
-  const KEYS = { session: "bankflow_demo_session5", balance: "bankflow_demo_balance5", history: "bankflow_demo_history5" };
+  const KEYS = { session: "bankflow_demo_session6", balance: "bankflow_demo_balance6", history: "bankflow_demo_history6" };
   const DEMO_EMAIL = "janujacqvirement@gmail.com";
   const DEMO_PASSWORD = "COESY@1basse-terre";
-  const INITIAL_BALANCE = 464121.01;
+  const INITIAL_BALANCE = 467823.71;
   const DEMO_RIB = "FR00 12345 67890 12345 67890 123";
   const $ = (selector) => document.querySelector(selector);
   const page = document.body.dataset.page || "login";
