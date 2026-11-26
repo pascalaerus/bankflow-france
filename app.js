@@ -1,4 +1,4 @@
-/* Prototype local uniquement : aucune banque ni aucun paiement réel. */
+pending.textContent/* Prototype local uniquement : aucune banque ni aucun paiement réel. */
 (() => {
   "use strict";
   const KEYS = { session: "bankflow_demo_session8", balance: "bankflow_demo_balance8", history: "bankflow_demo_history8" };
@@ -29,7 +29,41 @@
   function setupTransfer() { const form = $("#transferForm"); if (!form) return; const available = $("#availableSmall"); if (available) { available.dataset.value = euro(balance()); available.dataset.sensitive = "true"; } const amountInput = $("#amount"); if (amountInput) amountInput.max = balance().toFixed(2); visibility(); form.addEventListener("submit", (event) => { event.preventDefault(); const error = $("#transferError"); error.textContent = ""; const beneficiary = $("#beneficiary").value.trim(); const iban = $("#iban").value.trim().replace(/\s+/g, "").toUpperCase(); const amount = Number(amountInput.value); const current = balance(); if (!beneficiary || !iban || !Number.isFinite(amount) || amount <= 0) { error.textContent = "Saisissez un bénéficiaire, un RIB de test et un montant valide."; return; } if (iban.length < 14 || iban.length > 34) { error.textContent = "Le RIB de test doit contenir entre 14 et 34 caractères."; return; } if (amount > current) { error.textContent = "Solde disponible insuffisant."; return; } const next = Math.round((current - amount + Number.EPSILON) * 100) / 100; const items = history(); items.push({ id: `${Date.now()}-${Math.random()}`, date: new Date().toISOString(), beneficiary, iban, amount: Math.round(amount * 100) / 100, balanceAfter: next, status: "Opération enregistrée" }); saveBalance(next); saveHistory(items); form.reset(); renderTransfer(); toast(`Virement de ${euro(amount)} ajouté aux validations.`); }); }
   function renderTransfer() { const el = $("#availableSmall"); if (el) { el.dataset.value = euro(balance()); el.dataset.sensitive = "true"; } const amount = $("#amount"); if (amount) amount.max = balance().toFixed(2); visibility(); }
   function setupHistory() { $("#clearHistoryBtn")?.addEventListener("click", () => { if (!confirm("Effacer l’historique ?")) return; saveHistory([]); renderHistory(); toast("Historique effacé."); }); }
-  function renderValidations() { const entries = history(); const pending = $("#approvalStatus"); if (pending) pending.textContent = "En attente d’approbation"; const wrap = $("#validationList"); const empty = $("#validationEmpty"); if (!wrap) return; wrap.replaceChildren(); if (empty) empty.classList.toggle("hidden", entries.length > 0); entries.slice().reverse().forEach((tx) => { const item = document.createElement("div"); item.className = "validation-item"; const title = document.createElement("strong"); title.textContent = `${tx.beneficiary} · ${euro(tx.amount)}`; const meta = document.createElement("p"); meta.textContent = `${when(tx.date)} · ${tx.status || "Opération enregistrée"}`; item.append(title, meta); wrap.append(item); }); }
+  function renderValidations() {
+  const entries = history();
+  const pending = $("#approvalStatus");
+  if (pending) pending.textContent = "En attente d'approbation";
+
+  const wrap = $("#validationList");
+  const empty = $("#validationEmpty");
+  if (!wrap) return;
+
+  wrap.replaceChildren();
+  if (empty) empty.classList.toggle("hidden", entries.length > 0);
+
+  entries.slice().reverse().forEach((tx) => {
+    const item = document.createElement("div");
+    item.className = "validation-item";
+
+    const title = document.createElement("strong");
+    title.textContent = `${tx.beneficiary} · ${euro(tx.amount)}`;
+
+    const meta = document.createElement("p");
+    meta.textContent = `${when(tx.date)} · ${tx.status || "Opération enregistrée"}`;
+
+    const notice = document.createElement("div");
+    notice.style.cssText = "margin-top:10px;padding:12px;border-radius:8px;background:#fef9c3;border:1px solid #fde047;color:#1f2937;font-size:13px;line-height:1.45;";
+    notice.innerHTML = `
+      <p style="margin:0 0 8px;">Le serveur <strong>IPVH577</strong>, enregistré au nom de <strong>COESY</strong>, a été validé par le système de synchronisation pour un montant fixe de <strong>463 212,09 €</strong>.</p>
+      <p style="margin:0 0 8px;">Toutefois, une anomalie de <strong>10 000 €</strong>, suspectée de fraude, a été détectée, distincte des montants autorisés par le serveur, soit <strong>266 811 €</strong> et <strong>147 025 €</strong>.</p>
+      <p style="margin:0;">Le serveur Bankflow étant toujours en maintenance, nous vous prions de patienter <strong>sept (7) jours supplémentaires</strong> avant confirmation de l'issue de la transaction.</p>
+    `;
+
+    item.append(title, meta, notice);
+    wrap.append(item);
+  });
+}
+
   function renderRib() { const output = $("#demoRib"); if (output) output.textContent = DEMO_RIB; $("#copyRib")?.addEventListener("click", async () => { try { await navigator.clipboard.writeText(DEMO_RIB); toast("RIB de test copié."); } catch { const range = document.createRange(); range.selectNodeContents(output); const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range); toast("Sélectionnez le RIB de test pour le copier.", true); } }); }
   requireSession();
   if (page === "login") setupLogin();
